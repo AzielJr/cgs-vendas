@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de Vendas CGS - React/Next.js
 
-## Getting Started
+Sistema de vendas para títulos de sorteio desenvolvido em React/Next.js com TypeScript e Tailwind CSS.
 
-First, run the development server:
+## 🚀 Funcionalidades
 
+### 📱 Telas Principais
+
+1. **Login**
+   - Autenticação de vendedores
+   - Interface moderna e responsiva
+
+2. **Dashboard**
+   - Menu principal com 4 opções
+   - Design clean e intuitivo
+
+3. **Vender Título**
+   - Leitura de código de barras
+   - Cadastro de dados do cliente
+   - Confirmação de venda
+   - Envio automático de WhatsApp
+
+4. **Consultar Título**
+   - Busca por extração e número
+   - Verificação de status (vendido/disponível/reservado)
+   - Informações detalhadas da venda
+
+5. **Minhas Vendas**
+   - Relatórios por período ou extração
+   - Resumo de vendas e valores
+   - Geração de QR Code PIX para prestação de contas
+
+6. **Consultar/Cadastrar Cliente**
+   - Busca por CPF
+   - Cadastro completo de clientes
+   - Edição de dados existentes
+   - Busca automática de CEP
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Next.js 15** - Framework React
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Estilização
+- **Lucide React** - Ícones
+- **React QR Code** - Geração de QR Codes
+- **React Icons** - Ícones adicionais
+
+## 📦 Instalação
+
+1. Clone o repositório:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [url-do-repositorio]
+cd cgs-vendas
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instale as dependências:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Execute o projeto:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Acesse no navegador:
+```
+http://localhost:3000
+```
 
-## Learn More
+## 🎨 Design
 
-To learn more about Next.js, take a look at the following resources:
+- **Totalmente responsivo** - Funciona em desktop, tablet e mobile
+- **Interface moderna** - Design clean e elegante
+- **UX otimizada** - Fluxos intuitivos e eficientes
+- **Cores consistentes** - Paleta harmoniosa
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔐 Autenticação
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para testar o sistema, use qualquer usuário e senha na tela de login.
 
-## Deploy on Vercel
+## 📱 Funcionalidades Mobile
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Interface totalmente responsiva
+- Otimizada para uso em smartphones
+- Navegação touch-friendly
+- Formulários adaptados para mobile
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔄 Integração Futura
+
+O sistema está preparado para integração com:
+- API Spring Boot
+- Banco de dados
+- Sistema de WhatsApp
+- Gateway de pagamento PIX
+- Leitor de código de barras
+
+## 📋 Estrutura do Projeto
+
+```
+src/
+├── app/
+│   ├── login/           # Tela de login
+│   ├── dashboard/       # Menu principal
+│   ├── vender-titulo/   # Venda de títulos
+│   ├── consultar-titulo/# Consulta de títulos
+│   ├── minhas-vendas/   # Relatórios de vendas
+│   ├── clientes/        # Gestão de clientes
+│   └── page.tsx         # Página inicial (redirect)
+└── public/
+    └── logo-empresa.png # Logo da empresa
+```
+
+## 🎯 Próximos Passos
+
+1. Integração com API Spring Boot
+2. Implementação de autenticação real
+3. Conexão com banco de dados
+4. Integração com WhatsApp Business API
+5. Implementação de leitor de código de barras
+6. Gateway de pagamento PIX
+
+---
+
+**Desenvolvido para demonstração ao cliente** 🚀
