@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Camera, User, Phone, Mail, MapPin, CreditCard, CheckCircle, Loader2, Search } from 'lucide-react';
+import { ArrowLeft, Camera, User, Phone, Mail, MapPin, CreditCard, CheckCircle, Loader2, Search, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+// Importação dinâmica do scanner para evitar problemas de SSR
+const BarcodeScanner = dynamic(
+  () => import('react-qr-barcode-scanner'),
+  { ssr: false }
+);
 
 interface Cliente {
   cpf: string;
@@ -32,8 +39,7 @@ export default function VenderTituloPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [tituloInfo, setTituloInfo] = useState<{ numero: string; extracao: string; valor: number; disponivel: boolean } | null>(null);
   const [mostrarCamera, setMostrarCamera] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [scannerError, setScannerError] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
@@ -100,50 +106,38 @@ export default function VenderTituloPage() {
       .replace(/(-\d{3})\d+?$/, '$1');
   };
 
-  const abrirCamera = async () => {
-    try {
-      setMostrarCamera(true)
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } // Câmera traseira
-      })
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-      }
-    } catch (error) {
-      console.error('Erro ao acessar câmera:', error)
-      alert('Erro ao acessar a câmera. Verifique as permissões.')
-    }
-  }
-
-  const capturarFoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const canvas = canvasRef.current
-      const video = videoRef.current
-      const context = canvas.getContext('2d')
-      
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      context?.drawImage(video, 0, 0)
-      
-      // Simular leitura de código de barras
-      const codigoSimulado = Math.floor(Math.random() * 900000) + 100000
-      setCodigoBarras(codigoSimulado.toString())
-      
-      // Fechar câmera
-      fecharCamera()
-      
-      // Simular verificação do título
-      handleCodigoBarras()
-    }
-  }
+  const abrirCamera = () => {
+    setScannerError('');
+    setMostrarCamera(true);
+  };
 
   const fecharCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream
-      stream.getTracks().forEach(track => track.stop())
+    setMostrarCamera(false);
+    setScannerError('');
+  };
+
+  const handleScanResult = (err: any, result: any) => {
+    if (result) {
+      const scannedCode = result.text || result.getText();
+      if (scannedCode) {
+        setCodigoBarras(scannedCode);
+        setMostrarCamera(false);
+        // Verificar o título automaticamente após o scan
+        setTimeout(() => {
+          handleCodigoBarras();
+        }, 500);
+      }
     }
-    setMostrarCamera(false)
-  }
+  };
+
+  const handleScanError = (error: any) => {
+    console.error('Erro no scanner:', error);
+    if (error.name === 'NotAllowedError') {
+      setScannerError('Permissão de câmera negada. Por favor, permita o acesso à câmera.');
+    } else {
+      setScannerError('Erro ao acessar a câmera. Verifique as permissões.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 relative overflow-hidden">
@@ -439,33 +433,66 @@ export default function VenderTituloPage() {
       {mostrarCamera && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Capturar Código de Barras</h3>
-              <p className="text-sm text-gray-600">Posicione o código de barras na câmera</p>
-            </div>
-            
-            <div className="relative mb-4">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="w-full h-64 object-cover rounded-lg bg-gray-900"
-              />
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-            
-            <div className="flex space-x-3">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">Scanner de Código de Barras</h3>
+                <p className="text-sm text-gray-600">Posicione o código de barras na câmera</p>
+              </div>
               <button
                 onClick={fecharCamera}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
               >
-                Cancelar
+                <X className="h-6 w-6" />
               </button>
+            </div>
+            
+            {scannerError ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-red-700 text-sm">{scannerError}</p>
+                <button
+                  onClick={() => setScannerError('')}
+                  className="mt-2 text-red-600 hover:text-red-800 text-sm underline"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : (
+              <div className="relative mb-4">
+                <div className="w-full h-64 bg-gray-900 rounded-lg overflow-hidden">
+                  <BarcodeScanner
+                    width="100%"
+                    height="100%"
+                    onUpdate={handleScanResult}
+                    onError={handleScanError}
+                    facingMode="environment"
+                    formats={[
+                      'code_128',
+                      'code_39',
+                      'ean_13',
+                      'ean_8',
+                      'itf',
+                      'upc_a',
+                      'upc_e',
+                      'codabar'
+                    ]}
+                    delay={300}
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="border-2 border-red-500 w-64 h-16 rounded-lg opacity-50"></div>
+                </div>
+              </div>
+            )}
+            
+            <div className="text-center">
+              <p className="text-xs text-gray-500 mb-3">
+                Suporta: Code 128, Code 39, EAN-13, EAN-8, ITF (2x5 Intercalado), UPC-A, UPC-E, Codabar
+              </p>
               <button
-                onClick={capturarFoto}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                onClick={fecharCamera}
+                className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
               >
-                Capturar
+                Fechar Scanner
               </button>
             </div>
           </div>

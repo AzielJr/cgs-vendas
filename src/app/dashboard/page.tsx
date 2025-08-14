@@ -124,7 +124,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h2>
@@ -179,6 +179,15 @@ export default function DashboardPage() {
           })}
         </div>
       </main>
+      
+      {/* Footer Fixo */}
+      <footer className="fixed bottom-0 left-0 right-0 bg-gray-200 text-gray-600 py-1 px-4 z-10">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-xs">
+            © 2025 CGS • Sistema de Vendas - Versão 1.0
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
